@@ -1,13 +1,12 @@
 <?php
 
-use App\Http\Middleware\HandleAppearance;
-use App\Http\Middleware\HandleInertiaRequests;
-use App\Http\Middleware\CheckRole;
-use App\Http\Middleware\EnsureUserHasRole; // Added import for EnsureUserHasRole
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\BloggerMiddleware;
+use App\Models\User;
+use App\Http\Middleware\UserMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,16 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->encryptCookies(except: ['appearance']);
-
-        $middleware->web(append: [
-            HandleAppearance::class,
-            HandleInertiaRequests::class,
-            AddLinkHeadersForPreloadedAssets::class,
-            EnsureUserHasRole::class,
+        $middleware->alias([
+            "admin" => AdminMiddleware::class,
+            "user" => UserMiddleware::class,
+            "blogger" =>BloggerMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })
-    ->create();
+    })->create();

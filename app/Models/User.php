@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use App\Enums\UserRole;
 
 class User extends Authenticatable
 {
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -19,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -32,7 +37,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -41,51 +46,30 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class
         ];
     }
 
-    /**
-     * Get the user's primary role.
-     *
-     * @return string
-     */
-    public function getPrimaryRoleAttribute(): string
+    // In App\Models\User.php
+    public function getDashboardRoute(): string
     {
-        return optional($this->roles()->first())->name ?? 'customer';
+        return match($this->role) {
+            UserRole::Admin => route('admin.dashboard'),
+            UserRole::User => route('dashboard'),
+            UserRole::Blogger => route('blogger.dashboard'),
+            // Add more roles as needed
+            default => route('login'), // fallback
+        };
     }
 
     /**
-     * Define the relationship with roles.
+     * Get the user's initials
      */
-    public function roles()
+    public function initials(): string
     {
-        return $this->belongsToMany(Role::class);
+        return Str::of($this->name)
+            ->explode(' ')
+            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
+            ->implode('');
     }
-
-    /**
-     * Check if the user has a specific role.
-     *
-     * @param string|\Illuminate\Database\Eloquent\Collection $role
-     * @return bool
-     */
-    public function hasRole($role): bool
-    {
-        if (is_string($role)) {
-            return $this->roles()->where('name', $role)->exists();
-        }
-
-        return $this->roles()->whereIn('name', $role->pluck('name'))->exists();
-    }
-
-
-    /**
-     * Check if the user is an admin.
-     *
-     * @return bool
-     */
-//     public function isAdmin()
-//     {
-//         return $this->role === 'admin'; 
-//     }
-
 }
