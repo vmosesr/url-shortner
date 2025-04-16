@@ -25,6 +25,7 @@
                 @enderror
             </div>
             <button type="submit">Shorten URL</button>
+            <a href="{{ route('tasks-home') }}">tasks</a>
         </form>
     </div>
 </body>
