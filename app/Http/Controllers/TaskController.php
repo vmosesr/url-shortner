@@ -13,7 +13,7 @@ class TaskController extends Controller
     public function index()
     {
         $tasks = Task::orderBy('created_at', 'desc')->paginate(10); 
-        return view('tasks.tasks', compact('tasks'));
+        return view('tasks.tasks-home', compact('tasks'));
     }
 
     /**
@@ -39,7 +39,7 @@ class TaskController extends Controller
 
         Task::create($request->all());
 
-        return redirect()->route('tasks.index')->with('success', 'Task created successfully!');
+        return redirect()->route('tasks.tasks-home')->with('success', 'Task created successfully!');
     }
 
     /**
@@ -74,7 +74,7 @@ class TaskController extends Controller
 
         $task->update($request->all());
 
-        return redirect()->route('tasks.index')->with('success', 'Task updated successfully!');
+        return redirect()->route('tasks.tasks-home')->with('success', 'Task updated successfully!');
     }
 
     /**
@@ -83,6 +83,6 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
-        return redirect()->route('tasks.index')->with('success', 'Task deleted successfully!');
+        return redirect()->route('tasks.tasks-home')->with('success', 'Task deleted successfully!');
     }
 }
