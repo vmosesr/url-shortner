@@ -29,7 +29,7 @@ Route::get('/{code}', [UrlShortenerController::class, 'redirect'])->name('shorte
 
 // Define routes explicitly instead of using resource
 
-Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+Route::get('/tasks-home', [TaskController::class, 'index'])->name('tasks-home');
 Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
 Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
 Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
